@@ -1,6 +1,6 @@
 repositories:
-	repo-qemu:
-	  type:  git
+  repo-qemu:
+    type:  git
     url: git@github.com:cHolzberger/spack-repo-qemu.git
     version: master
   dot-spack:
