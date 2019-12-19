@@ -1,0 +1,85 @@
+#!/bin/bash 
+GHQ_URL="https://github.com/motemen/ghq/releases/download/v0.12.9/ghq_linux_amd64.zip"
+
+if [[ -n $DEBUG ]]; then
+	set -x
+fi
+
+set -euo pipefail 
+
+_SUDO="${1:-sudo}"
+
+EXIT=""
+LOG=$(mktemp /tmp/vcs-$(date +"%Y-%m-%d_%T_XXXXXX"))
+DIR=$(dirname $( realpath $0 ))
+
+pushd $(pwd)
+cd "$DIR"
+
+function quit {
+
+	if [[ "$?" != "0" ]]; then
+		echo "--"
+		echo "Something went wrong... check \"$LOG\" for details"
+	else
+		[[ -f "$LOG" ]] && rm "$LOG"
+		
+	fi
+	popd 
+}
+
+trap quit EXIT 
+
+if [[ -z "$_SUDO" && $UID != "0" ]]; then
+	echo "usage: bash ./.vcsinst [ ELEVATION_CMD | be root] e.g. bash ./.vcsinst sudo" 
+	echo "either be root or supply an elevation command"
+	EXIT=${EXIT:=1}
+fi 
+
+if [[ -f "ghq.zip" ]]; then
+	EXIT="${EXIT:=2}"
+	echo "error: ghq.zip allready exist in the output folder"
+fi
+
+pip=$(which pip)
+curl=$(which curl) 
+go=$(which go)
+unzip=$(which unzip) 
+
+if [[ -z $curl || -z $pip || -z $go ]]; then 
+	echo "Need python, pip and go installation"
+	EXIT=${EXIT:-2}	
+fi
+
+[[ -z $EXIT ]]
+
+
+
+echo -e "Loggin to: $LOG\n\n"
+
+echo -n "Installing vcstool...  "
+$_SUDO pip install vcstool 1>"$LOG" 2>&1   && echo "DONE" || exit 1
+
+echo -n "Installting ghq... "
+$curl -oghq.zip  -L $GHQ_URL 2>"$LOG"a
+
+echo -n "Installing CUE in GOPATH"
+
+go get -u cuelang.org/go/cmd/cue
+
+$unzip ghq.zip  
+rm ghq.zip 
+
+cat <<EOF
+SETUP COMMAND-COMPLETION:
+
+For bash append the following line to the ~/.bashrc file:
+source /usr/share/vcstool-completion/vcs.bash
+
+For tcsh append the following line to the ~/.cshrc file:
+source /usr/share/vcstool-completion/vcs.tcsh
+
+For zsh append the following line to the ~/.zshrc file:
+source /usr/share/vcstool-completion/vcs.zsh
+---
+EOF
