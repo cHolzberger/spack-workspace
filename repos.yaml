@@ -7,3 +7,7 @@ repositories:
     type: git
     url: git@github.com:cHolzberger/spack-dotfiles.git
     version: master
+  spack:
+    type: git
+    url: https://github.com/spack/spack.git
+    version: master
