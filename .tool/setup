@@ -1,4 +1,5 @@
 #!/bin/bash 
+
 GHQ_URL="https://github.com/motemen/ghq/releases/download/v0.12.9/ghq_linux_amd64.zip"
 
 if [[ -n $DEBUG ]]; then
@@ -82,4 +83,23 @@ source /usr/share/vcstool-completion/vcs.tcsh
 For zsh append the following line to the ~/.zshrc file:
 source /usr/share/vcstool-completion/vcs.zsh
 ---
+EOF
+
+
+popd
+echo "Importing remote repos"
+vcs import --repos --skip-existing < repos.yaml
+
+echo "Linking Spack"
+ln -s /opt/spack `pwd`/spack
+
+cat <<EOF
+You can enter the spack repo with the following command: 
+
+	source /opt/spack/XXX
+
+then you can add the qemu repo from this workspace with
+
+	spack repo add $(pwd)/qemu 
+
 EOF
