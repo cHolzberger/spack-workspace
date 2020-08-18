@@ -11,3 +11,11 @@ repositories:
     type: git
     url: https://github.com/spack/spack.git
     version: master
+  spack-scope:
+    type: git
+    url: git@github.com/cholzberger/spack-scope.git
+    version: develop
+  repo-misc:
+    type: git
+    url: git@github.com/cholzberger/spack-repo-misc.git
+    version: master
